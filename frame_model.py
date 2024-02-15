@@ -159,10 +159,12 @@ class FrameModel:
         cfu.disp_h2("edi3")
         cfu.disp_array(self.edi3, ["u1", "v1"])
 
-    def draw_deformed(self):
+    def draw_deformed(self, widget=False):
         """Draws the deformed model."""
 
-        cfv.close(self.deformed_fig)
+        if widget:
+            cfv.close(self.deformed_fig)
+
         self.deformed_fig = cfv.figure()
 
         plotpar = [2, 1, 0]
@@ -182,12 +184,15 @@ class FrameModel:
         cfv.scalgraph2(sfac, [1e-2, 0.5, 0], plotpar1)
         cfv.title("Displacements")
 
-        return cfv.figure_widget(self.deformed_fig)
+        if widget:
+            return cfv.figure_widget(self.deformed_fig)
 
-    def draw_normal_forces(self):
+    def draw_normal_forces(self, widget=False):
         """Draws the normal forces."""
 
-        cfv.close(self.normal_forces_fig)
+        if widget:
+            cfv.close(self.normal_forces_fig)
+
         self.normal_forces_fig = cfv.figure(2)
 
         plotpar = [2, 1]
@@ -200,12 +205,16 @@ class FrameModel:
         plotpar1 = 2
         cfv.scalgraph2(sfac, [3e4, 1.5, 0], plotpar1)
         cfv.title("Normal force")
-        return cfv.figure_widget(self.normal_forces_fig)
 
-    def draw_shear_forces(self):
+        if widget:
+            return cfv.figure_widget(self.normal_forces_fig)
+
+    def draw_shear_forces(self, widget=False):
         """Draws the shear forces."""
 
-        cfv.close(self.shear_forces_fig)
+        if widget:
+            cfv.close(self.shear_forces_fig)
+
         self.shear_forces_fig = cfv.figure(3)
 
         plotpar = [2, 1]
@@ -218,12 +227,16 @@ class FrameModel:
         plotpar1 = 2
         cfv.scalgraph2(sfac, [3e4, 0.5, 0], plotpar1)
         cfv.title("Shear force")
-        return cfv.figure_widget(self.shear_forces_fig)
 
-    def draw_moments(self):
+        if widget:
+            return cfv.figure_widget(self.shear_forces_fig)
+
+    def draw_moments(self, widget=False):
         """Draws the moments."""
 
-        cfv.close(self.moments_fig)
+        if widget:
+            cfv.close(self.moments_fig)
+
         self.moments_fig = cfv.figure(4)
 
         plotpar = [2, 1]
@@ -236,7 +249,9 @@ class FrameModel:
         plotpar1 = 2
         cfv.scalgraph2(sfac, [3e4, 0.5, 0], plotpar1)
         cfv.title("Moment")
-        return cfv.figure_widget(self.moments_fig)
+        
+        if widget:
+            return cfv.figure_widget(self.moments_fig)
 
     def show_and_wait(self):
         """Shows the plots and waits for the user to close them."""

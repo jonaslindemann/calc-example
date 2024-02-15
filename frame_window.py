@@ -162,10 +162,10 @@ class FrameWindow(QMainWindow):
     def create_result_tabs(self):
         """Skapa result tabbar"""
 
-        self.main_tabs.addTab(self.model.draw_deformed(), "Displacements")
-        self.main_tabs.addTab(self.model.draw_normal_forces(), "Normal forces")
-        self.main_tabs.addTab(self.model.draw_shear_forces(), "Shear forces")
-        self.main_tabs.addTab(self.model.draw_moments(), "Moments")
+        self.main_tabs.addTab(self.model.draw_deformed(widget=True), "Displacements")
+        self.main_tabs.addTab(self.model.draw_normal_forces(widget=True), "Normal forces")
+        self.main_tabs.addTab(self.model.draw_shear_forces(widget=True), "Shear forces")
+        self.main_tabs.addTab(self.model.draw_moments(widget=True), "Moments")
 
     def remove_result_tabs(self):
         """Ta bort resultat tabbar"""
