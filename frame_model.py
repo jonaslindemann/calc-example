@@ -105,7 +105,8 @@ class FrameModel:
         print("sfac=")
         print(sfac)
 
-        cfv.figure(1)
+        self.deformed_fig = cfv.figure()
+        cfv.clf()
         cfv.eldraw2(self.ex1, self.ey1, plotpar)
         cfv.eldraw2(self.ex2, self.ey2, plotpar)
         cfv.eldraw2(self.ex3, self.ey3, plotpar)
@@ -115,37 +116,44 @@ class FrameModel:
         cfv.dispbeam2(self.ex2, self.ey2, self.edi2, plotpar, sfac)
         cfv.dispbeam2(self.ex3, self.ey3, self.edi3, plotpar, sfac)
         cfv.axis([-1.5, 7.5, -0.5, 5.5])
+        cfv.axis("equal")
         plotpar1 = 2
         cfv.scalgraph2(sfac, [1e-2, 0.5, 0], plotpar1)
         cfv.title("Displacements")
+
+        return cfv.figure_widget(self.deformed_fig)
 
     def draw_normal_forces(self):
         """Draws the normal forces."""
 
         plotpar = [2, 1]
         sfac = cfv.scalfact2(self.ex1, self.ey1, self.es1[:, 0], 0.2)
-        cfv.figure(2)
+        self.normal_forces_fig = cfv.figure(2)
         cfv.secforce2(self.ex1, self.ey1, self.es1[:, 0], plotpar, sfac)
         cfv.secforce2(self.ex2, self.ey2, self.es2[:, 0], plotpar, sfac)
         cfv.secforce2(self.ex3, self.ey3, self.es3[:, 0], plotpar, sfac)
         cfv.axis([-1.5, 7.5, -0.5, 5.5])
+        cfv.axis("equal")
         plotpar1 = 2
         cfv.scalgraph2(sfac, [3e4, 1.5, 0], plotpar1)
         cfv.title("Normal force")
+        return cfv.figure_widget(self.normal_forces_fig)
 
     def draw_shear_forces(self):
         """Draws the shear forces."""
 
         plotpar = [2, 1]
         sfac = cfv.scalfact2(self.ex3, self.ey3, self.es3[:, 1], 0.2)
-        cfv.figure(3)
+        self.shear_forces_fig = cfv.figure(3)
         cfv.secforce2(self.ex1, self.ey1, self.es1[:, 1], plotpar, sfac)
         cfv.secforce2(self.ex2, self.ey2, self.es2[:, 1], plotpar, sfac)
         cfv.secforce2(self.ex3, self.ey3, self.es3[:, 1], plotpar, sfac)
         cfv.axis([-1.5, 7.5, -0.5, 5.5])
+        cfv.axis("equal")
         plotpar1 = 2
         cfv.scalgraph2(sfac, [3e4, 0.5, 0], plotpar1)
         cfv.title("Shear force")   
+        return cfv.figure_widget(self.shear_forces_fig)
 
     def draw_moments(self):
         """Draws the moments."""
@@ -155,14 +163,16 @@ class FrameModel:
         print("sfac=")
         print(sfac)
 
-        cfv.figure(4)
+        self.moments_fig = cfv.figure(4)
         cfv.secforce2(self.ex1, self.ey1, self.es1[:, 2], plotpar, sfac)
         cfv.secforce2(self.ex2, self.ey2, self.es2[:, 2], plotpar, sfac)
         cfv.secforce2(self.ex3, self.ey3, self.es3[:, 2], plotpar, sfac)
         cfv.axis([-1.5, 7.5, -0.5, 5.5])
+        cfv.axis("equal")
         plotpar1 = 2
         cfv.scalgraph2(sfac, [3e4, 0.5, 0], plotpar1)
-        cfv.title("Moment")    
+        cfv.title("Moment")
+        return cfv.figure_widget(self.moments_fig)    
 
     def show_and_wait(self):
         """Shows the plots and waits for the user to close them."""

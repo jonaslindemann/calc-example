@@ -3,15 +3,17 @@
 
 import sys
 
-from PyQt5.QtCore import QObject, pyqtSignal
-from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog
-from PyQt5 import uic
+from qtpy.QtCore import QObject, Signal
+from qtpy.QtWidgets import QApplication, QMainWindow, QFileDialog
+from qtpy import uic
+
+#import matplotlib.backends.backend_qt5agg
 
 import frame_window_res
 import frame_model as fm    
 
 class Stream(QObject):
-    newText = pyqtSignal(str)
+    newText = Signal(str)
 
     def write(self, text):
         self.newText.emit(str(text))
@@ -35,6 +37,7 @@ class FrameWindow(QMainWindow):
 
         uic.loadUi("frame_window.ui", self)
 
+
         sys.stdout = Stream(newText=self.on_update_text)
 
 
@@ -43,8 +46,9 @@ class FrameWindow(QMainWindow):
 
         self.init_model()
 
-    def __del__(self):
-        sys.stdout = sys.__stdout__
+        self.execute_action.triggered.connect(self.on_execute_actio)
+        self.new_action.triggered.connect(self.on_new_action)
+
 
     def on_update_text(self, text):
         """Uppdatera text i status fältet"""
@@ -54,6 +58,23 @@ class FrameWindow(QMainWindow):
         cursor.insertText(text)
         self.output_text.setTextCursor(cursor)
         self.output_text.ensureCursorVisible()
+
+    def on_execute_actio(self):
+        """Kör beräkningen"""
+
+        print("on_execute_action")
+
+        #self.update_model()
+        self.model.solve()
+        #self.model.print_results()
+        #self.update_controls()
+
+        self.remove_result_tabs()
+        self.main_tabs.addTab(self.model.draw_deformed(), "Displacements")
+        self.main_tabs.addTab(self.model.draw_normal_forces(), "Normal forces")
+        self.main_tabs.addTab(self.model.draw_shear_forces(), "Shear forces")
+        self.main_tabs.addTab(self.model.draw_moments(), "Moments")
+
 
     def init_model(self):
         """Initiera modellen"""
@@ -110,9 +131,10 @@ class FrameWindow(QMainWindow):
     def on_new_action(self):
         """Skapa en ny modell"""
 
+        print("on_new_action")
         self.init_model()
-        self.update_controls()
-        self.remove_result_tabs()
+        #self.update_controls()
+        #self.remove_result_tabs()
 
     def on_open_action(self):
         """Öppna in indata fil"""
