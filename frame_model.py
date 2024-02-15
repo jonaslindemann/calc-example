@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-# 
-# This is an example of a class encapsulating a frame model. 
+#
+# This is an example of a class encapsulating a frame model.
 # The class is used to solve the frame model and display the results.
 #
 # The model is a simple 2D frame with three beams. The beams are
@@ -13,6 +13,10 @@
 # The results are displayed using the calfem matplotlib visualization
 # library.
 #
+
+import sys, json
+sys.path.insert(0, "C:/Users/Jonas Lindemann/Development/calfem-python")
+
 
 import numpy as np
 import calfem.core as cfc
@@ -31,15 +35,58 @@ class FrameModel:
         self.I1 = 1.6e-5
         self.I2 = 5.4e-5
         self.q1 = 0.0
-        self.q2 = -10e3
-        self.q3 = 0.0
-        self.f1 = 2e3
+        self.q2 = 0.0
+        self.q3 = -10e3
+        self.f1 = 0.0
 
         self.edof = np.array([
-            [4, 5, 6, 1, 2, 3], 
-            [7, 8, 9, 10, 11, 12], 
+            [4, 5, 6, 1, 2, 3],
+            [7, 8, 9, 10, 11, 12],
             [4, 5, 6, 7, 8, 9]
         ])
+
+        self.normal_forces_fig = None
+        self.shear_forces_fig = None
+        self.moments_fig = None
+        self.deformed_fig = None
+
+    def save(self, filename):
+        """Saves the model to a file."""
+
+        param_dict = {
+            "w": self.w,
+            "h": self.h,
+            "E": self.E,
+            "A1": self.A1,
+            "A2": self.A2,
+            "I1": self.I1,
+            "I2": self.I2,
+            "q1": self.q1,
+            "q2": self.q2,
+            "q3": self.q3,
+            "f1": self.f1
+        }
+
+        with open(filename, "w") as file:
+            json.dump(param_dict, file)
+
+    def load(self, filename):
+        """Loads the model from a file."""
+
+        with open(filename, "r") as file:
+            param_dict = json.load(file)
+
+        self.w = param_dict["w"]
+        self.h = param_dict["h"]
+        self.E = param_dict["E"]
+        self.A1 = param_dict["A1"]
+        self.A2 = param_dict["A2"]
+        self.I1 = param_dict["I1"]
+        self.I2 = param_dict["I2"]
+        self.q1 = param_dict["q1"]
+        self.q2 = param_dict["q2"]
+        self.q3 = param_dict["q3"]
+        self.f1 = param_dict["f1"]
 
     def solve(self):
         """Solves the model."""
@@ -77,12 +124,27 @@ class FrameModel:
 
         self.ed = cfc.extract_ed(self.edof, self.a)
 
-        self.es1, self.edi1, self.ec1 = cfc.beam2s(self.ex1, self.ey1, ep1, self.ed[0, :], eq1, nep=21)
-        self.es2, self.edi2, self.ec2 = cfc.beam2s(self.ex2, self.ey2, ep1, self.ed[1, :], eq2, nep=21)
-        self.es3, self.edi3, self.ec3 = cfc.beam2s(self.ex3, self.ey3, ep3, self.ed[2, :], eq3, nep=21)
+        self.es1, self.edi1, self.ec1 = cfc.beam2s(
+            self.ex1, self.ey1, ep1, self.ed[0, :], eq1, nep=21)
+        self.es2, self.edi2, self.ec2 = cfc.beam2s(
+            self.ex2, self.ey2, ep1, self.ed[1, :], eq2, nep=21)
+        self.es3, self.edi3, self.ec3 = cfc.beam2s(
+            self.ex3, self.ey3, ep3, self.ed[2, :], eq3, nep=21)
 
     def print_results(self):
         """Prints the results of the model."""
+
+        cfu.disp_h2("Input parameters")
+        cfu.disp_h3("Geometry")
+        cfu.disp_array(np.array([[self.w, self.h]]), ["w", "h"])
+
+        cfu.disp_h3("Material")
+        cfu.disp_array(np.array([[self.E, self.A1, self.A2, self.I1, self.I2]]), [
+                       "E", "A1", "A2", "I1", "I2"])
+
+        cfu.disp_h3("Loads")
+        cfu.disp_array(np.array([[self.q1, self.q2, self.q3, self.f1]]), [
+                       "q1", "q2", "q3", "f1"])
 
         cfu.disp_h2("es1")
         cfu.disp_array(self.es1, ["N", "Vy", "Mz"])
@@ -100,12 +162,11 @@ class FrameModel:
     def draw_deformed(self):
         """Draws the deformed model."""
 
+        cfv.close(self.deformed_fig)
+        self.deformed_fig = cfv.figure()
+
         plotpar = [2, 1, 0]
         sfac = cfv.scalfact2(self.ex3, self.ey3, self.edi3, 0.1)
-        print("sfac=")
-        print(sfac)
-
-        self.deformed_fig = cfv.figure()
         cfv.clf()
         cfv.eldraw2(self.ex1, self.ey1, plotpar)
         cfv.eldraw2(self.ex2, self.ey2, plotpar)
@@ -126,9 +187,11 @@ class FrameModel:
     def draw_normal_forces(self):
         """Draws the normal forces."""
 
+        cfv.close(self.normal_forces_fig)
+        self.normal_forces_fig = cfv.figure(2)
+
         plotpar = [2, 1]
         sfac = cfv.scalfact2(self.ex1, self.ey1, self.es1[:, 0], 0.2)
-        self.normal_forces_fig = cfv.figure(2)
         cfv.secforce2(self.ex1, self.ey1, self.es1[:, 0], plotpar, sfac)
         cfv.secforce2(self.ex2, self.ey2, self.es2[:, 0], plotpar, sfac)
         cfv.secforce2(self.ex3, self.ey3, self.es3[:, 0], plotpar, sfac)
@@ -142,9 +205,11 @@ class FrameModel:
     def draw_shear_forces(self):
         """Draws the shear forces."""
 
+        cfv.close(self.shear_forces_fig)
+        self.shear_forces_fig = cfv.figure(3)
+
         plotpar = [2, 1]
         sfac = cfv.scalfact2(self.ex3, self.ey3, self.es3[:, 1], 0.2)
-        self.shear_forces_fig = cfv.figure(3)
         cfv.secforce2(self.ex1, self.ey1, self.es1[:, 1], plotpar, sfac)
         cfv.secforce2(self.ex2, self.ey2, self.es2[:, 1], plotpar, sfac)
         cfv.secforce2(self.ex3, self.ey3, self.es3[:, 1], plotpar, sfac)
@@ -152,18 +217,17 @@ class FrameModel:
         cfv.axis("equal")
         plotpar1 = 2
         cfv.scalgraph2(sfac, [3e4, 0.5, 0], plotpar1)
-        cfv.title("Shear force")   
+        cfv.title("Shear force")
         return cfv.figure_widget(self.shear_forces_fig)
 
     def draw_moments(self):
         """Draws the moments."""
 
+        cfv.close(self.moments_fig)
+        self.moments_fig = cfv.figure(4)
+
         plotpar = [2, 1]
         sfac = cfv.scalfact2(self.ex3, self.ey3, self.es3[:, 2], 0.2)
-        print("sfac=")
-        print(sfac)
-
-        self.moments_fig = cfv.figure(4)
         cfv.secforce2(self.ex1, self.ey1, self.es1[:, 2], plotpar, sfac)
         cfv.secforce2(self.ex2, self.ey2, self.es2[:, 2], plotpar, sfac)
         cfv.secforce2(self.ex3, self.ey3, self.es3[:, 2], plotpar, sfac)
@@ -172,11 +236,12 @@ class FrameModel:
         plotpar1 = 2
         cfv.scalgraph2(sfac, [3e4, 0.5, 0], plotpar1)
         cfv.title("Moment")
-        return cfv.figure_widget(self.moments_fig)    
+        return cfv.figure_widget(self.moments_fig)
 
     def show_and_wait(self):
         """Shows the plots and waits for the user to close them."""
-        cfv.show_and_wait() 
+        cfv.show_and_wait()
+
 
 if __name__ == "__main__":
 
