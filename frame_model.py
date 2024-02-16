@@ -15,8 +15,6 @@
 #
 
 import sys, json
-sys.path.insert(0, "C:/Users/Jonas Lindemann/Development/calfem-python")
-
 
 import numpy as np
 import calfem.core as cfc

@@ -10,8 +10,6 @@ from qtpy.QtWidgets import QApplication, QMainWindow, QFileDialog, QPlainTextEdi
 from qtpy.QtGui import QFont, QTextCursor
 from qtpy import uic
 
-sys.path.insert(0, "C:/Users/Jonas Lindemann/Development/calfem-python")
-
 
 class Stream(QObject):
     """Klass för att omdirigera stdout till textfält"""
