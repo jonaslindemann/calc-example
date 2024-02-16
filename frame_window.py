@@ -61,19 +61,21 @@ class FrameWindow(QMainWindow):
         self.execute_action.triggered.connect(self.on_execute_action)
         self.new_action.triggered.connect(self.on_new_action)
         self.open_action.triggered.connect(self.on_open_action)
-        # ...
+        self.save_action.triggered.connect(self.on_save_action)
+        self.save_as_action.triggered.connect(self.on_save_as_action)
 
-        self.h_edit = QLineEdit(self)
-        self.w_edit = QLineEdit(self)
-        self.E_edit = QLineEdit(self)
-        self.A1_edit = QLineEdit(self)
-        self.A2_edit = QLineEdit(self)
-        self.I1_edit = QLineEdit(self)
-        self.I2_edit = QLineEdit(self)
-        self.q0_edit = QLineEdit(self)
-        self.P_edit = QLineEdit(self)
+        # --- Koppla edit-fält till funktioner
 
-        # ...
+        self.w_edit.editingFinished.connect(self.on_editing_finished)
+        self.h_edit.editingFinished.connect(self.on_editing_finished)
+        self.E_edit.editingFinished.connect(self.on_editing_finished)
+        self.A1_edit.editingFinished.connect(self.on_editing_finished)
+        self.A2_edit.editingFinished.connect(self.on_editing_finished)
+        self.I1_edit.editingFinished.connect(self.on_editing_finished)
+        self.I2_edit.editingFinished.connect(self.on_editing_finished)
+        self.q0_edit.editingFinished.connect(self.on_editing_finished)
+        self.P_edit.editingFinished.connect(self.on_editing_finished)
+
 
     def solve_model(self):
         """Lös modellen"""
